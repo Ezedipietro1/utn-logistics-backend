@@ -1,0 +1,88 @@
+services:
+  clientes:
+    build:
+      context: ./Clientes
+      dockerfile: Dockerfile
+    container_name: clientes
+    ports:
+      - "8081:8081"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:sqlite:/data/clientes.db
+      - SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.sqlite.JDBC
+    volumes:
+      - ./Clientes/data:/data
+    restart: unless-stopped
+    networks:
+      - tpi-networks
+
+  solicitudtraslado:
+    build:
+      context: ./SolicitudTraslado
+      dockerfile: Dockerfile
+    container_name: solicitudtranslado
+    ports:
+      - "8082:8082"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:sqlite:/data/solicitudes.db
+      - SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.sqlite.JDBC
+      - CLIENTE_SERVICE_URL=http://clientes:8081
+      - OSRM_BASE_URL=http://osrm:5000
+    volumes:
+      - ./SolicitudTraslado/data:/data
+    restart: unless-stopped
+    networks:
+      - tpi-networks
+    depends_on:
+      - osrm
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.0.0
+    container_name: keycloak
+    ports:
+      - "8080:8080"
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin123
+      - KC_DB=dev-file  # Base de datos embebida para desarrollo
+    command: start-dev
+    networks:
+      - tpi-networks
+    volumes:
+      - keycloak-data:/opt/keycloak/data
+
+  osrm:
+    image: ghcr.io/project-osrm/osrm-backend:latest
+    platform: linux/amd64
+    container_name: osrm
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./tpi/osrm-data:/data
+    command: >
+      osrm-routed /data/argentina-latest.osrm
+    restart: unless-stopped
+    networks:
+      - tpi-networks
+
+  gateway:
+    build:
+      # Asegúrate de que tu servicio Gateway esté en una carpeta llamada "Gateway"
+      context: ./Gateway 
+      dockerfile: Dockerfile
+    container_name: gateway
+    ports:
+      - "8083:8083" # El puerto que definimos para el Gateway
+    restart: unless-stopped
+    networks:
+      - tpi-networks
+    depends_on:
+      - clientes
+      - solicitudtraslado
+      - keycloak
+
+volumes:
+  keycloak-data:
+
+networks:
+  tpi-networks:
+    driver: bridge
