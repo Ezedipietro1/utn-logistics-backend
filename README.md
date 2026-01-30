@@ -3,7 +3,7 @@
 Backend application developed as an academic project for Backend de Aplicaciones (UTN).
 The system manages the logistics of container transportation using a microservices architecture.
 
-Main Features
+__Main Features__
 
 Container transport request management
 
@@ -17,7 +17,7 @@ Real-time transport status tracking
 
 Role-based access (Client, Operator, Transporter)
 
-Architecture
+__Architecture__
 
 Microservices-based architecture
 
@@ -27,7 +27,7 @@ RESTful APIs
 
 Docker & Docker Compose
 
-Security
+__Security__
 
 Authentication and authorization using Keycloak
 
@@ -35,7 +35,7 @@ JWT-based security
 
 Role-based access control
 
-Technologies
+__Technologies__
 
 Java
 
@@ -51,8 +51,7 @@ Swagger / OpenAPI
 
 SQL (relational database)
 
-External API integration (Google Maps Directions API)
+__Academic Context__
 
-Academic Context
+This project was developed as part of the Trabajo Práctico Integrador (TPI) for the course Backend de Aplicaciones, focusing on backend architecture, security, and best practices.)
 
-This project was developed as part of the Trabajo Práctico Integrador (TPI) for the course Backend de Aplicaciones, focusing on backend architecture, security, and best practices.
